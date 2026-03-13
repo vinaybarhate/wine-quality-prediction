@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<title>Wine Quality Prediction</title>
+
+<style>
+
+body{
+margin:0;
+font-family:"Segoe UI", Arial, sans-serif;
+
+background-image:url("https://images.unsplash.com/photo-1510812431401-41d2bd2722f3");
+background-size:cover;
+background-position:center;
+
+min-height:100vh;
+
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+body::before{
+content:"";
+position:absolute;
+top:0;
+left:0;
+
+width:100%;
+height:100%;
+
+background:rgba(60,0,30,0.6);
+
+z-index:0;
+}
+
+.card{
+
+position:relative;
+z-index:1;
+
+width:1000px;
+
+background:rgba(255,255,255,0.92);
+
+backdrop-filter: blur(10px);
+
+padding:40px;
+
+border-radius:20px;
+
+box-shadow:0 25px 60px rgba(0,0,0,0.4);
+}
+
+h2{
+text-align:center;
+color:#7b1e3c;
+margin-bottom:6px;
+}
+
+.subtitle{
+text-align:center;
+color:#666;
+margin-bottom:15px;
+}
+
+.model-info{
+text-align:center;
+color:#777;
+font-size:13px;
+margin-bottom:30px;
+}
+
+h3{
+color:#7b1e3c;
+margin-bottom:15px;
+}
+
+.grid{
+
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:20px;
+
+}
+
+input{
+
+width:100%;
+padding:12px;
+
+border-radius:10px;
+border:1px solid #ccc;
+
+font-size:14px;
+}
+
+.btn{
+
+margin-top:25px;
+
+width:100%;
+
+padding:14px;
+
+font-size:16px;
+
+background:linear-gradient(135deg,#8e244d,#5a1530);
+
+color:white;
+
+border:none;
+
+border-radius:12px;
+
+cursor:pointer;
+}
+
+.btn:hover{
+opacity:0.9;
+}
+
+.example-btn{
+
+background:#777;
+margin-top:10px;
+
+}
+
+.result-box{
+
+margin-top:20px;
+
+padding:15px;
+
+background:#f3e5f5;
+
+border-left:6px solid #7b1e3c;
+
+font-size:18px;
+
+animation:fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn{
+
+from{
+opacity:0;
+transform:translateY(10px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
+hr{
+
+margin:40px 0;
+border:none;
+border-top:1px dashed #ccc;
+
+}
+
+.file-box{
+
+border:2px dashed #c5a3b8;
+
+padding:30px;
+
+border-radius:14px;
+
+text-align:center;
+
+background:#fafafa;
+}
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+margin-top:25px;
+
+font-size:13px;
+
+}
+
+th, td{
+
+border:1px solid #ccc;
+
+padding:6px 8px;
+
+text-align:center;
+
+}
+
+th{
+
+background-color:#7b1e3c;
+
+color:white;
+
+}
+
+.table-container{
+
+overflow-x:auto;
+margin-top:15px;
+
+}
+
+footer{
+
+margin-top:30px;
+text-align:center;
+
+font-size:13px;
+
+color:#777;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<div style="text-align:center;margin-bottom:10px;">
+<img src="https://cdn-icons-png.flaticon.com/512/3050/3050152.png" width="70">
+</div>
+
+<h2>Wine Quality Prediction</h2>
+
+<p class="subtitle">Machine Learning Based Wine Analyzer</p>
+
+<p class="model-info">
+Model: Random Forest • Dataset: Wine Quality Dataset • Features: 10 Chemical Properties
+</p>
+
+<h3>🔬 Single Wine Prediction</h3>
+
+<form action="/predict" method="post">
+
+<div class="grid">
+
+<input type="number" step="any" name="fixed_acidity" placeholder="Fixed Acidity" required>
+
+<input type="number" step="any" name="volatile_acidity" placeholder="Volatile Acidity" required>
+
+<input type="number" step="any" name="citric_acid" placeholder="Citric Acid" required>
+
+<input type="number" step="any" name="residual_sugar" placeholder="Residual Sugar" required>
+
+<input type="number" step="any" name="chlorides" placeholder="Chlorides" required>
+
+<input type="number" step="any" name="free_sulfur_dioxide" placeholder="Free Sulfur Dioxide" required>
+
+<input type="number" step="any" name="total_sulfur_dioxide" placeholder="Total Sulfur Dioxide" required>
+
+<input type="number" step="any" name="ph" placeholder="pH Level" required>
+
+<input type="number" step="any" name="sulphates" placeholder="Sulphates" required>
+
+<input type="number" step="any" name="alcohol" placeholder="Alcohol %" required>
+
+</div>
+
+<button class="btn" type="submit">
+Predict Wine Quality
+</button>
+
+<button type="button" class="btn example-btn" onclick="fillExample()">
+Load Example Data
+</button>
+
+</form>
+
+{% if prediction %}
+
+<div class="result-box">
+
+Predicted Wine Quality: <b>{{ prediction }}</b>
+
+<br><br>
+
+Quality Level:
+<b style="color:#7b1e3c">{{ label }}</b>
+
+</div>
+
+{% endif %}
+
+<hr>
+
+<h3>📂 Batch Prediction (CSV Upload)</h3>
+
+<form action="/batch-predict" method="post" enctype="multipart/form-data">
+
+<div class="file-box">
+
+<input type="file" name="file" accept=".csv" required>
+
+<p>Upload CSV file containing wine chemical properties</p>
+
+</div>
+
+<button class="btn" type="submit">
+Upload & Predict
+</button>
+
+</form>
+
+{% if batch_result %}
+
+<h3>📊 Batch Prediction Results</h3>
+
+<div class="table-container">
+
+<table>
+
+<tr>
+
+{% for key in batch_result[0].keys() %}
+<th>{{ key }}</th>
+{% endfor %}
+
+</tr>
+
+{% for row in batch_result %}
+
+<tr>
+
+{% for value in row.values() %}
+<td>{{ value }}</td>
+{% endfor %}
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+{% endif %}
+
+<footer>
+Flask · Machine Learning Project · Wine Quality Predictor
+</footer>
+
+</div>
+
+
+<script>
+
+function fillExample(){
+
+document.getElementsByName("fixed_acidity")[0].value = 7.4;
+document.getElementsByName("volatile_acidity")[0].value = 0.7;
+document.getElementsByName("citric_acid")[0].value = 0.0;
+document.getElementsByName("residual_sugar")[0].value = 1.9;
+document.getElementsByName("chlorides")[0].value = 0.076;
+document.getElementsByName("free_sulfur_dioxide")[0].value = 11;
+document.getElementsByName("total_sulfur_dioxide")[0].value = 34;
+document.getElementsByName("ph")[0].value = 3.51;
+document.getElementsByName("sulphates")[0].value = 0.56;
+document.getElementsByName("alcohol")[0].value = 9.4;
+
+}
+
+</script>
+
+</body>
+</html>

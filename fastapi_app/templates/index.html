@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wine Quality Prediction</title>
+
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #f3e5f5, #ede7f6);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            background: #ffffff;
+            padding: 30px;
+            width: 650px;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        h2, h3 {
+            text-align: center;
+            color: #4a148c;
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .row input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background-color: #7b1fa2;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #4a148c;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #e8f5e9;
+            border-left: 6px solid #2e7d32;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #ede7f6;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <h2>🍷 Wine Quality Prediction</h2>
+
+    <!-- SINGLE PREDICTION FORM -->
+    <form action="/predict" method="post">
+
+        <div class="row">
+            <input type="number" step="any" name="fixed_acidity" placeholder="Fixed Acidity" required>
+            <input type="number" step="any" name="volatile_acidity" placeholder="Volatile Acidity" required>
+        </div>
+
+        <div class="row">
+            <input type="number" step="any" name="citric_acid" placeholder="Citric Acid" required>
+            <input type="number" step="any" name="residual_sugar" placeholder="Residual Sugar" required>
+        </div>
+
+        <div class="row">
+            <input type="number" step="any" name="chlorides" placeholder="Chlorides" required>
+            <input type="number" step="any" name="free_sulfur_dioxide" placeholder="Free Sulfur Dioxide" required>
+        </div>
+
+        <div class="row">
+            <input type="number" step="any" name="total_sulfur_dioxide" placeholder="Total Sulfur Dioxide" required>
+            <input type="number" step="any" name="ph" placeholder="pH" required>
+        </div>
+
+        <div class="row">
+            <input type="number" step="any" name="sulphates" placeholder="Sulphates" required>
+            <input type="number" step="any" name="alcohol" placeholder="Alcohol" required>
+        </div>
+
+        <button type="submit">Predict Wine Quality</button>
+    </form>
+
+    {% if prediction is not none %}
+        <div class="result">
+            Predicted Wine Quality: {{ prediction }}
+        </div>
+    {% endif %}
+
+    <hr style="margin: 30px 0;">
+
+    <!-- BATCH PREDICTION -->
+    <h3>📂 Batch Prediction (CSV Upload)</h3>
+
+    <form action="/batch-predict" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".csv" required>
+        <button type="submit">Upload & Predict</button>
+    </form>
+
+    {% if batch_result %}
+        <h3>📊 Batch Prediction Results</h3>
+        <table>
+            <tr>
+                {% for key in batch_result[0].keys() %}
+                    <th>{{ key }}</th>
+                {% endfor %}
+            </tr>
+
+            {% for row in batch_result %}
+                <tr>
+                    {% for value in row.values() %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+</div>
+
+</body>
+</html>
